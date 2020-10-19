@@ -45,4 +45,18 @@ describe("/app GET endpoint", () => {
         );
       });
   });
+
+  it("returns a sorted and filtered array", () => {
+    const sortedFiltered = playstore
+      .filter((app) => app.Genres.includes("Casual"))
+      .sort((a, b) => a.Rating - b.Rating);
+
+    return supertest(app)
+      .get("/apps")
+      .query({ sort: "rating", genres: "casual" })
+      .then(res=>{
+        expect(res.body.map(app=>app.Rating)).to.deep.equal(sortedFiltered.map(app=>app.Rating))
+        expect(res.body).to.deep.have.members(sortedFiltered)
+      })
+  });
 });
